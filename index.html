@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block name -%}
+Project EIDOLON (Solvable-Degraded)
+{%- endblock %}
+
+{% block description -%}
+Project EIDOLON (Solvable-Degraded) is a dynamic system built on a forest of nodes, where each node contains both a numeric value and a character. The system evolves through a sequence of online operations, all of which are XOR-encoded and depend on the previous query’s result, enforcing strict online processing.
+
+The structure begins with no edges and is dynamically modified through edge toggle operations. Despite this dynamic behavior, the graph is always guaranteed to remain a forest, ensuring that any two connected nodes are joined by exactly one simple path.
+
+Each query requires reconstructing the path between two nodes and treating it as a string formed by concatenating node characters along that path. This string must be checked against a set of forbidden patterns. Efficient multi-pattern matching is required, as naive substring checking is too slow under the constraints.
+
+If the path is valid, the problem becomes an optimization task: selecting exactly k nodes along the path in increasing order to minimize a cost function based on node values and squared distances between consecutive selected positions. This introduces a dynamic programming structure over the path.
+
+A direct DP transition over all previous positions would be too slow, but the quadratic structure allows optimization using the Convex Hull Trick, reducing each DP layer to linear complexity in the path length. Combined with the constraint that the total length of all queried paths is bounded, this ensures efficiency.
+
+Edge cases are critical: if two nodes are not connected, the answer is -1; if the path contains any forbidden substring, the answer is -1; and if the path length is smaller than k, the query is impossible. Additionally, the system uses XOR-encoded inputs where each value depends on the previous answer, and any invalid result resets the last answer to zero.
+
+Overall, the problem combines dynamic graph operations, multi-pattern string matching, and optimized DP over paths, requiring careful implementation of multiple advanced algorithmic techniques under strict online constraints.
+{%- endblock %}
+
+{% block input_format -%}
+Input format:
+- The first line contains two integers N and Q, representing the number of nodes and number of operations.
+- The next line contains N integers A[i], representing the value of each node.
+- The next line contains N characters C[i], representing the character of each node.
+- The next line contains M, the number of forbidden strings.
+- The next M lines contain the forbidden strings.
+- Each of the next Q lines contains an encoded operation.
+
+All values are XOR-encoded using:
+real_value = x ⊕ (last_answer ⊕ query_index)
+
+where query_index starts from 1 and last_answer is initially 0.
+{%- endblock %}
+
+{% block output_format -%}
+Output format:
+- For each query of type 5, print the minimum cost if valid.
+- If invalid (disconnected nodes, forbidden substring, or impossible selection), print -1.
+- After each query, update last_answer with the result (or 0 if the result is -1).
+{%- endblock %}
+
+{% block constraints %}
+1 ≤ N, Q ≤ 2×10⁵
+1 ≤ k ≤ 200
+Total length of forbidden strings ≤ 2×10⁵
+The graph always remains a forest
+{%- endblock %}
+
+{% block example -%}
+Input:
+5 1
+1 2 3 4 5
+a b c d e
+1
+ab
+5 1 5 2 3
+
+Expected output:
+-1
+{%- endblock %}
+
+{% block explanation -%}
+The path from node 1 to node 5 forms a string which contains a forbidden substring, making the query invalid.
+
+Therefore the output is -1.
+{%- endblock %}
